@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        #identities-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        #identities-table th, #identities-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <table id="identities-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for identity in identities %}
+            <tr>
+                <td>{{ identity.name }}</td>
+                <td>{{ identity.age }}</td>
+                <td>{{ identity.gender }}</td>
+                <td>{{ identity.location }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
