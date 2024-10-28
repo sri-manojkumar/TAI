@@ -1,2 +1,2 @@
 Flask==2.3.2
-gunicorn==21.2.0
+opencv-python==4.8.0.74
