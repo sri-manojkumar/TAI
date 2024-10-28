@@ -3,60 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Capture</title>
+    <title>Camera Capture App</title>
     <style>
-        #camera-container {
-            display: none;
-            opacity: 1;
-            transition: opacity 1s;
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
         }
-        #captured-image {
-            margin-top: 20px;
+        h1 {
+            margin-bottom: 20px;
+        }
+        #camera {
             display: none;
+            margin-bottom: 20px;
+        }
+        video {
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            width: 320px;
+            height: 240px;
+            margin-bottom: 10px;
+        }
+        #capturedImage {
+            display: none;
+            margin-top: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            width: 320px;
+            height: 240px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <h2>Image Capture Application</h2>
-    <button id="scan-button">Open Camera</button>
-    <div id="camera-container">
-        <button id="capture-button">Capture</button>
+    <h1>Image Capture App</h1>
+    <button id="startCameraButton">Open Camera</button>
+    <div id="camera">
+        <video id="video" autoplay></video>
+        <button id="captureButton">Capture</button>
+        <canvas id="canvas" style="display: none;"></canvas>
     </div>
-    <img id="captured-image" alt="Captured Image"/>
+    <img id="capturedImage" alt="Captured Image" />
 
     <script>
-        const scanButton = document.getElementById('scan-button');
-        const captureButton = document.getElementById('capture-button');
-        const cameraContainer = document.getElementById('camera-container');
-        const capturedImage = document.getElementById('captured-image');
+        const startCameraButton = document.getElementById('startCameraButton');
+        const cameraDiv = document.getElementById('camera');
+        const video = document.getElementById('video');
+        const captureButton = document.getElementById('captureButton');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const capturedImage = document.getElementById('capturedImage');
 
-        // Open camera on button click
-        scanButton.onclick = () => {
-            cameraContainer.style.display = 'block';
-            cameraContainer.style.opacity = '1';
-        };
+        startCameraButton.addEventListener('click', async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            cameraDiv.style.display = 'block';
+            startCameraButton.style.display = 'none';
+        });
 
-        // Capture image and display
-        captureButton.onclick = async () => {
-            try {
-                const response = await fetch('/capture', { method: 'POST' });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    capturedImage.src = 'data:image/jpeg;base64,' + data.image;
-                    capturedImage.style.display = 'block';
-
-                    // Fade out camera view
-                    cameraContainer.style.opacity = '0';
-                    setTimeout(() => {
-                        cameraContainer.style.display = 'none';
-                    }, 1000);
-                } else {
-                    alert('Failed to capture image. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error capturing image:', error);
-            }
-        };
+        captureButton.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            capturedImage.src = dataURL;
+            capturedImage.style.display = 'block';
+            video.srcObject.getTracks().forEach(track => track.stop());
+            cameraDiv.style.display = 'none';
+        });
     </script>
 </body>
 </html>
