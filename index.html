@@ -3,63 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Image Capture</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+        #camera-container {
+            display: none;
+            opacity: 1;
+            transition: opacity 1s;
         }
-        .login-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 300px;
-            text-align: center;
-        }
-        h2 {
-            margin-bottom: 20px;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
+        #captured-image {
+            margin-top: 20px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
-        {% if error %}
-        <p class="error">{{ error }}</p>
-        {% endif %}
-        <form action="{{ url_for('login') }}" method="post">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
+    <h2>Image Capture Application</h2>
+    <button id="scan-button">Open Camera</button>
+    <div id="camera-container">
+        <button id="capture-button">Capture</button>
     </div>
+    <img id="captured-image" alt="Captured Image"/>
+
+    <script>
+        const scanButton = document.getElementById('scan-button');
+        const captureButton = document.getElementById('capture-button');
+        const cameraContainer = document.getElementById('camera-container');
+        const capturedImage = document.getElementById('captured-image');
+
+        // Open camera on button click
+        scanButton.onclick = () => {
+            cameraContainer.style.display = 'block';
+            cameraContainer.style.opacity = '1';
+        };
+
+        // Capture image and display
+        captureButton.onclick = async () => {
+            try {
+                const response = await fetch('/capture', { method: 'POST' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    capturedImage.src = 'data:image/jpeg;base64,' + data.image;
+                    capturedImage.style.display = 'block';
+
+                    // Fade out camera view
+                    cameraContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        cameraContainer.style.display = 'none';
+                    }, 1000);
+                } else {
+                    alert('Failed to capture image. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error capturing image:', error);
+            }
+        };
+    </script>
 </body>
 </html>
