@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        #camera {
+            width: 100%;
+            height: 50vh;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #identities-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        #identities-table th, #identities-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <div id="camera">
+        <!-- This is where the webcam feed will be displayed -->
+        <button id="scan">Scan</button>
+        <button id="capture">Capture</button>
+    </div>
+    <table id="identities-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for identity in identities %}
+            <tr>
+                <td>{{ identity.name }}</td>
+                <td>{{ identity.age }}</td>
+                <td>{{ identity.gender }}</td>
+                <td>{{ identity.location }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        document.getElementById('capture').addEventListener('click', function() {
+            fetch('/capture', {
+                method: 'POST',
+            }).then(response => {
+                return response.text(); // Get the response text/html
+            }).then(html => {
+                document.documentElement.innerHTML = html;
+            }).catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
