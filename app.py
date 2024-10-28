@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-import cv2
-import base64
+import cv2  # Ensure cv2 is installed in your environment
+import numpy as np  # Ensure numpy is installed in your environment
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -49,12 +49,15 @@ def get_available_identities():
 @app.route('/capture', methods=['POST'])
 def capture():
     # Here, you'd normally capture and process the image from the webcam
-    # For now, just simulate getting the identity
     current_identity = get_identity()
     
     identities = get_available_identities()
     # Simulating the matching and sorting mechanism
-    sorted_identities = sorted(identities, key=lambda x: x['name'] == current_identity['name'], reverse=True)
+    sorted_identities = sorted(
+        identities, 
+        key=lambda x: x['name'] == current_identity['name'], 
+        reverse=True
+    )
     
     return render_template('dashboard.html', identities=sorted_identities)
 
