@@ -3,21 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Image Capture</title>
+    <style>
+        #camera-container {
+            display: none;
+            opacity: 1;
+            transition: opacity 1s;
+        }
+        #captured-image {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Login</h1>
-    <form method="POST" action="/">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="submit">Login</button>
-    </form>
-    {% if error %}
-    <p style="color: red;">{{ error }}</p>
-    {% endif %}
+    <h2>Image Capture Application</h2>
+    <button id="scan-button">Open Camera</button>
+    <div id="camera-container">
+        <button id="capture-button">Capture</button>
+    </div>
+    <img id="captured-image" alt="Captured Image"/>
+
+    <script>
+        const scanButton = document.getElementById('scan-button');
+        const captureButton = document.getElementById('capture-button');
+        const cameraContainer = document.getElementById('camera-container');
+        const capturedImage = document.getElementById('captured-image');
+
+        // Open camera on button click
+        scanButton.onclick = () => {
+            cameraContainer.style.display = 'block';
+            cameraContainer.style.opacity = '1';
+        };
+
+        // Capture image and display
+        captureButton.onclick = async () => {
+            try {
+                const response = await fetch('/capture', { method: 'POST' });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    capturedImage.src = 'data:image/jpeg;base64,' + data.image;
+                    capturedImage.style.display = 'block';
+
+                    // Fade out camera view
+                    cameraContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        cameraContainer.style.display = 'none';
+                    }, 1000);
+                } else {
+                    alert('Failed to capture image. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error capturing image:', error);
+            }
+        };
+    </script>
 </body>
 </html>
