@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-import os
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'your_secret_key')
+app.secret_key = 'your_secret_key'
 
-# Default credentials
+# Dummy credentials for login
 USERNAME = 'user_one'
 PASSWORD = 'pass_one'
 
@@ -14,25 +13,26 @@ def index():
 
 @app.route('/login', methods=['POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    # Simple authentication check
     if username == USERNAME and password == PASSWORD:
-        session['username'] = username
+        session['logged_in'] = True
         return redirect(url_for('dashboard'))
     else:
-        return redirect(url_for('index'))
+        return render_template('index.html', error="Invalid credentials, please try again.")
 
 @app.route('/dashboard')
 def dashboard():
-    if 'username' in session:
+    if session.get('logged_in'):
         return render_template('dashboard.html')
-    else:
-        return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)
+    session.pop('logged_in', None)
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=True)
